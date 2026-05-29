@@ -1,0 +1,118 @@
+   <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Breathing App</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          text-align: center;
+          padding: 50px;
+          background: #121212;
+          color: white;
+        }
+        h1 { font-size: 36px; margin-bottom: 20px; }
+        .circle {
+          width: 200px;
+          height: 200px;
+          background: #4A90E2;
+          border-radius: 50%;
+          margin: 20px auto;
+          transform: scale(1);
+          transition: transform 2s ease-in-out;
+        }
+        button {
+          background: #4A90E2;
+          color: white;
+          border: none;
+          padding: 15px 30px;
+          border-radius: 10px;
+          font-size: 18px;
+          margin: 10px;
+        }
+        .buttons { margin-top: 20px; }
+        .timer { font-size: 24px; margin: 20px; }
+      </style>
+    </head>
+    <body>
+      <h1>🌬️ Breathing App</h1>
+      <div class="circle"></div>
+      <div class="timer" id="timer">00:00</div>
+      <div class="buttons">
+        <button onclick="startBreathing('4-7-8')">4-7-8 Calm</button>
+        <button onclick="startBreathing('box')">Box Breathing</button>
+        <button onclick="startBreathing('wim-hof')">Wim Hof Energize</button>
+        <button onclick="startBreathing('hexagon')">Hexagon Breathing</button>
+        <button onclick="startBreathing('triangle')">Triangle Breathing</button>
+      </div>
+      <audio id="sound" src="https://www.soundjay.com/nature/ocean-wave-1.mp3"></audio>
+      <script>
+        const patterns = {
+          '4-7-8': { inhale: 4, hold: 7, exhale: 8 },
+          'box': { inhale: 4, hold: 4, exhale: 4 },
+          'wim-hof': { inhale: 2, hold: 0, exhale: 2 },
+          'hexagon': { inhale: 6, hold: 6, exhale: 6 },
+          'triangle': { inhale: 3, hold: 3, exhale: 3 }
+        };
+
+        let timerInterval;
+        let remainingTime = 0;
+
+        function startBreathing(patternKey) {
+          const pattern = patterns[patternKey];
+          let step = 'inhale';
+          remainingTime = pattern.inhale;
+
+          // Start timer
+          clearInterval(timerInterval);
+          timerInterval = setInterval(() => {
+            remainingTime--;
+            document.getElementById('timer').textContent = ${String(Math.floor(remainingTime / 60)).padStart(2, '0')}:${String(remainingTime % 60).padStart(2, '0')};
+            if (remainingTime <= 0) {
+              switch (step) {
+                case 'inhale':
+                  step = 'hold';
+                  remainingTime = pattern.hold;
+                  animateCircle('hold');
+                  speak('Hold');
+                  break;
+                case 'hold':
+                  step = 'exhale';
+                  remainingTime = pattern.exhale;
+                  animateCircle('exhale');
+                  speak('Exhale');
+                  break;
+                case 'exhale':
+                  clearInterval(timerInterval);
+                  alert('Cycle complete!');
+                  return;
+              }
+            }
+          }, 1000);
+
+          // Animation
+          animateCircle('inhale');
+          speak('Inhale');
+        }
+
+        function animateCircle(step) {
+          const circle = document.querySelector('.circle');
+          circle.style.transform = step === 'exhale' ? 'scale(0.8)' : 'scale(1.2)';
+        }
+
+        function speak(text) {
+          const synth = window.speechSynthesis;
+          const utterance = new SpeechSynthesisUtterance(text);
+          synth.speak(utterance);
+        }
+
+        function playSound(sound) {
+          const audio = document.getElementById('sound');
+          audio.src = sound;
+          audio.play();
+        }
+      </script>
+    </body>
+    </html>
+
