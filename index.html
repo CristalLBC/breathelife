@@ -37,8 +37,8 @@
     </head>
     <body>
       <h1>🌬️ Breathing App</h1>
-      <div class="circle"></div>
-      <div class="timer" id="timer">00:00</div>
+<div id="circle" class="your-circle-classes"></div>
+       <div class="timer" id="timer">00:00</div>
       <div class="buttons">
         <button onclick="startBreathing('4-7-8')">4-7-8 Calm</button>
         <button onclick="startBreathing('box')">Box Breathing</button>
@@ -112,7 +112,61 @@
           audio.src = sound;
           audio.play();
         }
-      </script>
+         
+  // 1. Grab the elements from your HTML
+  const circle = document.getElementById('circle');
+  const timerDisplay = document.getElementById('timer');
+  const boxButton = document.getElementById('btn-box');
+
+  let activeInterval;
+  let timeLeft = 0;
+
+  // 2. Function to update the timer text
+  function updateTimer() {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  // 3. The Box Breathing Logic
+  function startBoxBreathing() {
+    clearInterval(activeInterval); // Stop any previous breathing cycles
+    timeLeft = 0;
+    
+    // Add a CSS transition so the circle animates smoothly
+    circle.style.transition = "transform 4s linear";
+
+    const breatheCycle = () => {
+      // Inhale: Grow the circle
+      circle.style.transform = "scale(1.5)";
+      
+      setTimeout(() => {
+        // Hold (circle stays large for 4s)
+        
+        setTimeout(() => {
+          // Exhale: Shrink the circle back to normal
+          circle.style.transform = "scale(1)";
+          
+          setTimeout(() => {
+             // Hold empty (circle stays small for 4s)
+          }, 4000);
+        }, 4000);
+      }, 4000);
+    };
+
+    // Run the cycle immediately, then repeat every 16 seconds (4+4+4+4)
+    breatheCycle();
+    activeInterval = setInterval(() => {
+      breatheCycle();
+      timeLeft += 16; 
+      updateTimer();
+    }, 16000);
+  }
+
+  // 4. Attach the logic to the button click
+  boxButton.addEventListener('click', startBoxBreathing);
+</script>
+      
     </body>
     </html>
 
